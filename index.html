@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8 Puzzle Solver</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4A90E2 0%, #1E3C72 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .instructions {
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .top-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"] {
+            background-color: #2b303b;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            width: 120px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        button, select {
+            background-color: #2b303b;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        button:hover, select:hover {
+            background-color: #3b4252;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .board-container {
+            background-color: #284462;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px);
+            gap: 10px;
+        }
+
+        .tile {
+            background-color: #63D2FF;
+            color: white;
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.15s ease, background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tile:active {
+            transform: scale(0.95);
+        }
+
+        .tile.empty {
+            background-color: #1e334a;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            cursor: default;
+        }
+
+        .playback-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .playback-controls button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .bottom-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .method-label {
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+
+        .solve-btn {
+            background-color: #2b303b;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 24px;
+            color: #a3f7bf;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>8 Puzzle Solver</h1>
+    <p class="subtitle">Solve the 8-Puzzle with AI-Powered Algorithms</p>
+    <p class="instructions">Enter a puzzle state using digits 0-8, select a method, and click Solve to find a solution.</p>
+
+    <div class="top-controls">
+        <label for="initialState">Initial State:</label>
+        <input type="text" id="initialState" value="208135467" maxlength="9">
+        <button onclick="setState()">Set State</button>
+        <button onclick="randomizeState()">Randomize</button>
+    </div>
+
+    <div class="board-container">
+        <div class="board" id="board">
+            </div>
+    </div>
+
+    <div class="playback-controls">
+        <button onclick="prevStep()">&#8592;</button>
+        <button onclick="playSolution()">&#9658;</button>
+        <button onclick="nextStep()">&#8594;</button>
+    </div>
+
+    <div class="bottom-controls">
+        <div style="display: flex; align-items: center;">
+            <span class="method-label">Method:</span>
+            <select id="method">
+                <option value="uniform">Uniform Cost</option>
+                <option value="astar">A* Search</option>
+            </select>
+        </div>
+        <button class="solve-btn" onclick="startSolving()">Solve</button>
+        <button>Stats</button>
+        <button>Learn</button>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <script>
+        let state = [2, 0, 8, 1, 3, 5, 4, 6, 7]; // 0 temsil eder boşluğu
+        const goalState = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+        
+        let solutionPath = [];
+        let currentStep = 0;
+        let isPlaying = false;
+
+        const boardEl = document.getElementById('board');
+        const inputEl = document.getElementById('initialState');
+        const msgEl = document.getElementById('message');
+
+        function init() {
+            renderBoard();
+        }
+
+        function renderBoard() {
+            boardEl.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const tile = document.createElement('div');
+                tile.classList.add('tile');
+                if (state[i] === 0) {
+                    tile.classList.add('empty');
+                    tile.innerText = '';
+                } else {
+                    tile.innerText = state[i];
+                    tile.onclick = () => moveTile(i);
+                }
+                boardEl.appendChild(tile);
+            }
+            inputEl.value = state.join('');
+            checkWin();
+        }
+
+        function moveTile(index) {
+            const emptyIndex = state.indexOf(0);
+            const validMoves = getValidMoves(emptyIndex);
+
+            if (validMoves.includes(index)) {
+                // Swap
+                [state[index], state[emptyIndex]] = [state[emptyIndex], state[index]];
+                solutionPath = []; // Kullanıcı hamle yaparsa eski çözümü sıfırla
+                renderBoard();
+            }
+        }
+
+        function getValidMoves(emptyIndex) {
+            const moves = [];
+            const row = Math.floor(emptyIndex / 3);
+            const col = emptyIndex % 3;
+
+            if (row > 0) moves.push(emptyIndex - 3); // Yukarı
+            if (row < 2) moves.push(emptyIndex + 3); // Aşağı
+            if (col > 0) moves.push(emptyIndex - 1); // Sol
+            if (col < 2) moves.push(emptyIndex + 1); // Sağ
+
+            return moves;
+        }
+
+        function setState() {
+            const val = inputEl.value;
+            if (val.length === 9 && new Set(val.split('')).size === 9 && /^[0-8]+$/.test(val)) {
+                state = val.split('').map(Number);
+                solutionPath = [];
+                msgEl.innerText = "";
+                renderBoard();
+            } else {
+                alert("Lütfen 0'dan 8'e kadar her rakamın 1 kez kullanıldığı 9 haneli bir durum girin.");
+            }
+        }
+
+        // Çözülebilir bir rastgele durum oluşturma
+        function randomizeState() {
+            do {
+                state = [...goalState].sort(() => Math.random() - 0.5);
+            } while (!isSolvable(state));
+            solutionPath = [];
+            msgEl.innerText = "";
+            renderBoard();
+        }
+
+        // 8-Puzzle çözülebilirlik kontrolü (Inversion Count)
+        function isSolvable(arr) {
+            let invCount = 0;
+            for (let i = 0; i < 9 - 1; i++) {
+                for (let j = i + 1; j < 9; j++) {
+                    if (arr[i] && arr[j] && arr[i] > arr[j]) {
+                        invCount++;
+                    }
+                }
+            }
+            return invCount % 2 === 0;
+        }
+
+        function checkWin() {
+            if (state.join('') === goalState.join('')) {
+                msgEl.innerText = "Bulmaca Çözüldü! 🎉";
+            }
+        }
+
+        // --- YAPAY ZEKA ÇÖZÜCÜ (BFS - Uniform Cost) ---
+        async function startSolving() {
+            if (state.join('') === goalState.join('')) {
+                msgEl.innerText = "Zaten çözülmüş durumda!";
+                return;
+            }
+
+            if(!isSolvable(state)) {
+                msgEl.innerText = "Hata: Bu tahta durumu matematiksel olarak çözülemez!";
+                msgEl.style.color = "#ff6b6b";
+                return;
+            }
+
+            msgEl.style.color = "#a3f7bf";
+            msgEl.innerText = "Çözülüyor... Lütfen bekleyin.";
+            
+            // UI kilitlenmesin diye ufak bir bekleme (Asenkron hissi)
+            setTimeout(() => {
+                const path = solve(state);
+                if (path) {
+                    solutionPath = path;
+                    currentStep = 0;
+                    msgEl.innerText = `Çözüm bulundu! Toplam ${path.length} adım. Oynat butonuna bas.`;
+                } else {
+                    msgEl.innerText = "Çözüm bulunamadı.";
+                }
+            }, 100);
+        }
+
+        function solve(start) {
+            let queue = [{ s: start, path: [] }];
+            let visited = new Set();
+            visited.add(start.join(''));
+            const goalStr = goalState.join('');
+
+            while (queue.length > 0) {
+                let current = queue.shift();
+                
+                if (current.s.join('') === goalStr) {
+                    return current.path;
+                }
+
+                let emptyIdx = current.s.indexOf(0);
+                let moves = getValidMoves(emptyIdx);
+
+                for (let move of moves) {
+                    let nextState = [...current.s];
+                    [nextState[emptyIdx], nextState[move]] = [nextState[move], nextState[emptyIdx]];
+                    let nextStr = nextState.join('');
+
+                    if (!visited.has(nextStr)) {
+                        visited.add(nextStr);
+                        queue.push({ s: nextState, path: [...current.path, nextState] });
+                    }
+                }
+            }
+            return null;
+        }
+
+        // --- OYNATMA KONTROLLERİ ---
+        function nextStep() {
+            if (solutionPath.length > 0 && currentStep < solutionPath.length) {
+                state = solutionPath[currentStep];
+                currentStep++;
+                renderBoard();
+            }
+        }
+
+        function prevStep() {
+            if (solutionPath.length > 0 && currentStep > 0) {
+                currentStep--;
+                // Önceki adımı alırken eğer ilk adımsak başlangıç durumunu nasıl bulacağız?
+                // En temizi solutionPath içine baştaki state'i de koymak ama biz yapmadık.
+                // O yüzden ufak bir trick:
+                if(currentStep === 0) {
+                   // başa döndük
+                } else {
+                   state = solutionPath[currentStep - 1];
+                   renderBoard();
+                }
+            }
+        }
+
+        function playSolution() {
+            if (solutionPath.length === 0 || currentStep >= solutionPath.length || isPlaying) return;
+            isPlaying = true;
+            
+            const interval = setInterval(() => {
+                if (currentStep < solutionPath.length) {
+                    state = solutionPath[currentStep];
+                    renderBoard();
+                    currentStep++;
+                } else {
+                    clearInterval(interval);
+                    isPlaying = false;
+                }
+            }, 400); // Her adım arası 400ms bekle
+        }
+
+        // Oyunu başlat
+        init();
+
+    </script>
+</body>
+</html>
