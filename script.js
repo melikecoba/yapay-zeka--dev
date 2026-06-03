@@ -10,6 +10,30 @@ const tahtaElemani = document.getElementById('oyunTahtasi');
 const girdiElemani = document.getElementById('baslangicDurumuGirdisi');
 const mesajElemani = document.getElementById('bilgiMesaji');
 
+// --- ARAYÜZ KONTROLLERİ ---
+function ekranDegistir(hedefEkran) {
+    if(hedefEkran === 'oyun') {
+        document.getElementById('girisEkrani').classList.add('gizli');
+        document.getElementById('oyunEkrani').classList.remove('gizli');
+        // Oyuna girerken tahtayı hazırlayalım
+        oyunuBaslat(); 
+    } else if (hedefEkran === 'giris') {
+        document.getElementById('oyunEkrani').classList.add('gizli');
+        document.getElementById('girisEkrani').classList.remove('gizli');
+        // Mesajları temizleyelim
+        mesajElemani.innerText = "";
+    }
+}
+
+function nasilOynanirGoster() {
+    document.getElementById('nasilOynanirModal').classList.remove('gizli');
+}
+
+function nasilOynanirKapat() {
+    document.getElementById('nasilOynanirModal').classList.add('gizli');
+}
+
+// --- OYUN MANTIĞI ---
 function oyunuBaslat() {
     tahtayiCiz();
 }
@@ -40,6 +64,7 @@ function tasTasi(tiklananIndeks) {
     if (gecerliHamleler.includes(tiklananIndeks)) {
         [mevcutDurum[tiklananIndeks], mevcutDurum[bosKareIndeksi]] = [mevcutDurum[bosKareIndeksi], mevcutDurum[tiklananIndeks]];
         cozumYolu = []; 
+        mesajElemani.innerText = "";
         tahtayiCiz();
     }
 }
@@ -93,6 +118,7 @@ function matematikselOlarakCozulebilirMi(dizi) {
 function kazanmaKontroluYapm() {
     if (mevcutDurum.join('') === hedefDurum.join('')) {
         mesajElemani.innerText = "Bulmaca Başarıyla Çözüldü! 🎉";
+        mesajElemani.style.color = "#a3f7bf";
     }
 }
 
@@ -154,6 +180,7 @@ function yapayZekaIleCoz(baslangicDurumu) {
     return null;
 }
 
+// --- OYNATMA KONTROLLERİ ---
 function sonrakiAdim() {
     if (cozumYolu.length > 0 && guncelAdimIndeksi < cozumYolu.length) {
         mevcutDurum = cozumYolu[guncelAdimIndeksi];
@@ -190,4 +217,5 @@ function cozumuOynat() {
     }, 400); 
 }
 
-oyunuBaslat();
+// Artık oyunu sayfa yüklenince değil, "Oyuna Başla" butonuna basınca başlatıyoruz.
+// O yüzden oyunuBaslat() fonksiyonu ekranDegistir('oyun') içine taşındı.

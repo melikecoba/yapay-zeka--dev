@@ -8,46 +8,79 @@
 </head>
 <body>
 
-    <h1>8 Taş Bulmacası</h1>
-    <p class="alt-baslik">Yapay Zeka Destekli Algoritmalarla Çözün</p>
-    <p class="aciklamalar">0-8 arası rakamları kullanarak bir başlangıç durumu girin, bir yöntem seçin ve Çöz'e tıklayın.</p>
-
-    <div class="ust-kontroller">
-        <label for="baslangicDurumuGirdisi">Başlangıç Durumu:</label>
-        <input type="text" id="baslangicDurumuGirdisi" value="208135467" maxlength="9">
-        <button onclick="durumuAyarla()">Durumu Ayarla</button>
-        <button onclick="rastgeleDurumOlustur()">Rastgele Dağıt</button>
-    </div>
-
-    <div class="tahta-tasiyici">
-        <div class="tahta" id="oyunTahtasi">
+    <!-- GİRİŞ EKRANI -->
+    <div id="girisEkrani" class="ekran-kapsayici">
+        <div class="giris-kutusu">
+            <h1>8 Taş Bulmacası</h1>
+            <p class="alt-baslik">Yapay Zeka Destekli Algoritmalar</p>
+            
+            <div class="giris-butonlari">
+                <button class="buyuk-buton basla-buton" onclick="ekranDegistir('oyun')">Oyuna Başla</button>
+                <button class="buyuk-buton bilgi-buton" onclick="nasilOynanirGoster()">Nasıl Oynanır?</button>
             </div>
-    </div>
-
-    <div class="oynatma-kontrolleri">
-        <button onclick="oncekiAdim()" title="Önceki Adım">
-            <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
-        </button>
-        <button onclick="cozumuOynat()" title="Oynat">
-            <svg viewBox="0 0 24 24" style="margin-left: 3px;"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <button onclick="sonrakiAdim()" title="Sonraki Adım">
-            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-        </button>
-    </div>
-
-    <div class="alt-kontroller">
-        <div style="display: flex; align-items: center;">
-            <span class="yontem-etiketi">Yöntem:</span>
-            <select id="cozumYontemi">
-                <option value="uniform">Eşit Maliyetli (Uniform Cost)</option>
-                <option value="astar">A* Arama</option>
-            </select>
         </div>
-        <button class="coz-butonu" onclick="cozmeyeBasla()">Çöz</button>
     </div>
 
-    <div class="mesaj" id="bilgiMesaji"></div>
+    <!-- NASIL OYNANIR PENCERESİ (MODAL) -->
+    <div id="nasilOynanirModal" class="modal gizli">
+        <div class="modal-icerik">
+            <h2>Nasıl Oynanır?</h2>
+            <ul class="bilgi-listesi">
+                <li><b>Amaç:</b> Karmaşık olarak dizilmiş taşları kaydırarak 1'den 8'e kadar sıralamak ve boşluğu en sona getirmektir.</li>
+                <li><b>Oynanış:</b> Boş (koyu mavi) alanın yanındaki taşlara tıklayarak yerlerini değiştirebilirsiniz.</li>
+                <li><b>Kendi Durumunu Gir:</b> "Başlangıç Durumu" kutusuna 0-8 arası rakamları sırasıyla yazarak kendi bulmacanı oluşturabilirsin (0 boşluğu temsil eder).</li>
+                <li><b>Yapay Zeka Çözümü:</b> "Çöz" butonuna tıkladığınızda bilgisayar en kısa yolu bulur. Ardından oynat (►) butonuna basarak çözümü izleyebilirsiniz.</li>
+            </ul>
+            <button class="kapat-buton" onclick="nasilOynanirKapat()">Anladım, Kapat</button>
+        </div>
+    </div>
+
+    <!-- OYUN EKRANI (Başlangıçta Gizli) -->
+    <div id="oyunEkrani" class="ekran-kapsayici gizli">
+        
+        <div class="ust-bilgi-alani">
+            <h1 style="font-size: 2rem;">8 Taş Bulmacası</h1>
+            <button class="ana-menu-buton" onclick="ekranDegistir('giris')">Ana Menüye Dön</button>
+        </div>
+        
+        <div class="ust-kontroller">
+            <label for="baslangicDurumuGirdisi">Başlangıç Durumu:</label>
+            <input type="text" id="baslangicDurumuGirdisi" value="208135467" maxlength="9">
+            <button onclick="durumuAyarla()">Durumu Ayarla</button>
+            <button onclick="rastgeleDurumOlustur()">Rastgele Dağıt</button>
+        </div>
+
+        <div class="tahta-tasiyici">
+            <div class="tahta" id="oyunTahtasi">
+                <!-- Taşlar JavaScript ile oluşturulacak -->
+            </div>
+        </div>
+
+        <div class="oynatma-kontrolleri">
+            <button onclick="oncekiAdim()" title="Önceki Adım">
+                <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
+            </button>
+            <button onclick="cozumuOynat()" title="Oynat">
+                <svg viewBox="0 0 24 24" style="margin-left: 3px;"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button onclick="sonrakiAdim()" title="Sonraki Adım">
+                <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+            </button>
+        </div>
+
+        <div class="alt-kontroller">
+            <div style="display: flex; align-items: center;">
+                <span class="yontem-etiketi">Yöntem:</span>
+                <select id="cozumYontemi">
+                    <option value="uniform">Eşit Maliyetli (Uniform Cost)</option>
+                    <option value="astar">A* Arama</option>
+                </select>
+            </div>
+            <button class="coz-butonu" onclick="cozmeyeBasla()">Yapay Zekaya Çözdür</button>
+        </div>
+
+        <div class="mesaj" id="bilgiMesaji"></div>
+    </div>
 
     <script src="script.js"></script>
 </body>
