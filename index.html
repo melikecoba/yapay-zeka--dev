@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>8 Puzzle Solver</title>
+    <title>8 Taş Bulmacası Çözücü</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
 
@@ -31,19 +31,19 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .subtitle {
+        .alt-baslik {
             font-size: 1.1rem;
             margin-bottom: 20px;
             opacity: 0.9;
         }
 
-        .instructions {
+        .aciklamalar {
             font-size: 0.9rem;
             margin-bottom: 20px;
             opacity: 0.8;
         }
 
-        .top-controls {
+        .ust-kontroller {
             display: flex;
             gap: 10px;
             align-items: center;
@@ -83,7 +83,7 @@
             transform: translateY(1px);
         }
 
-        .board-container {
+        .tahta-tasiyici {
             background-color: #284462;
             padding: 40px;
             border-radius: 12px;
@@ -91,14 +91,14 @@
             margin-bottom: 20px;
         }
 
-        .board {
+        .tahta {
             display: grid;
             grid-template-columns: repeat(3, 80px);
             grid-template-rows: repeat(3, 80px);
             gap: 10px;
         }
 
-        .tile {
+        .tas {
             background-color: #63D2FF;
             color: white;
             font-size: 2rem;
@@ -112,33 +112,41 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .tile:active {
+        .tas:active {
             transform: scale(0.95);
         }
 
-        .tile.empty {
+        .tas.bos {
             background-color: #1e334a;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
             cursor: default;
         }
 
-        .playback-controls {
+        .oynatma-kontrolleri {
             display: flex;
             gap: 15px;
             margin-bottom: 30px;
         }
 
-        .playback-controls button {
-            width: 40px;
-            height: 40px;
+        .oynatma-kontrolleri button {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 0;
+            background-color: #2b303b;
         }
 
-        .bottom-controls {
+        .oynatma-kontrolleri button svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+            transition: fill 0.2s;
+        }
+
+        .alt-kontroller {
             display: flex;
             gap: 15px;
             align-items: center;
@@ -146,16 +154,17 @@
             justify-content: center;
         }
 
-        .method-label {
+        .yontem-etiketi {
             font-size: 0.9rem;
             margin-right: 5px;
         }
 
-        .solve-btn {
-            background-color: #2b303b;
+        .coz-butonu {
+            background-color: #1e2229;
+            font-weight: 600;
         }
 
-        .message {
+        .mesaj {
             margin-top: 20px;
             font-weight: bold;
             min-height: 24px;
@@ -165,244 +174,248 @@
 </head>
 <body>
 
-    <h1>8 Puzzle Solver</h1>
-    <p class="subtitle">Solve the 8-Puzzle with AI-Powered Algorithms</p>
-    <p class="instructions">Enter a puzzle state using digits 0-8, select a method, and click Solve to find a solution.</p>
+    <h1>8 Taş Bulmacası</h1>
+    <p class="alt-baslik">Yapay Zeka Destekli Algoritmalarla Çözün</p>
+    <p class="aciklamalar">0-8 arası rakamları kullanarak bir başlangıç durumu girin, bir yöntem seçin ve Çöz'e tıklayın.</p>
 
-    <div class="top-controls">
-        <label for="initialState">Initial State:</label>
-        <input type="text" id="initialState" value="208135467" maxlength="9">
-        <button onclick="setState()">Set State</button>
-        <button onclick="randomizeState()">Randomize</button>
+    <div class="ust-kontroller">
+        <label for="baslangicDurumuGirdisi">Başlangıç Durumu:</label>
+        <input type="text" id="baslangicDurumuGirdisi" value="208135467" maxlength="9">
+        <button onclick="durumuAyarla()">Durumu Ayarla</button>
+        <button onclick="rastgeleDurumOlustur()">Rastgele Dağıt</button>
     </div>
 
-    <div class="board-container">
-        <div class="board" id="board">
-            </div>
+    <div class="tahta-tasiyici">
+        <div class="tahta" id="oyunTahtasi">
+            <!-- Taşlar JavaScript ile oluşturulacak -->
+        </div>
     </div>
 
-    <div class="playback-controls">
-        <button onclick="prevStep()">&#8592;</button>
-        <button onclick="playSolution()">&#9658;</button>
-        <button onclick="nextStep()">&#8594;</button>
+    <div class="oynatma-kontrolleri">
+        <button onclick="oncekiAdim()" title="Önceki Adım">
+            <!-- Sol Ok İkonu -->
+            <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
+        </button>
+        <button onclick="cozumuOynat()" title="Oynat">
+            <!-- Üçgen Oynat (Play) İkonu -->
+            <svg viewBox="0 0 24 24" style="margin-left: 3px;"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button onclick="sonrakiAdim()" title="Sonraki Adım">
+            <!-- Sağ Ok İkonu -->
+            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+        </button>
     </div>
 
-    <div class="bottom-controls">
+    <div class="alt-kontroller">
         <div style="display: flex; align-items: center;">
-            <span class="method-label">Method:</span>
-            <select id="method">
-                <option value="uniform">Uniform Cost</option>
-                <option value="astar">A* Search</option>
+            <span class="yontem-etiketi">Yöntem:</span>
+            <select id="cozumYontemi">
+                <option value="uniform">Eşit Maliyetli (Uniform Cost)</option>
+                <option value="astar">A* Arama</option>
             </select>
         </div>
-        <button class="solve-btn" onclick="startSolving()">Solve</button>
-        <button>Stats</button>
-        <button>Learn</button>
+        <button class="coz-butonu" onclick="cozmeyeBasla()">Çöz</button>
     </div>
 
-    <div class="message" id="message"></div>
+    <div class="mesaj" id="bilgiMesaji"></div>
 
     <script>
-        let state = [2, 0, 8, 1, 3, 5, 4, 6, 7]; // 0 temsil eder boşluğu
-        const goalState = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+        let mevcutDurum = [2, 0, 8, 1, 3, 5, 4, 6, 7]; // 0 boşluğu temsil eder
+        const hedefDurum = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+        let baslangicDurumuKopyasi = [];
         
-        let solutionPath = [];
-        let currentStep = 0;
-        let isPlaying = false;
+        let cozumYolu = [];
+        let guncelAdimIndeksi = 0;
+        let animasyonOynuyorMu = false;
 
-        const boardEl = document.getElementById('board');
-        const inputEl = document.getElementById('initialState');
-        const msgEl = document.getElementById('message');
+        const tahtaElemani = document.getElementById('oyunTahtasi');
+        const girdiElemani = document.getElementById('baslangicDurumuGirdisi');
+        const mesajElemani = document.getElementById('bilgiMesaji');
 
-        function init() {
-            renderBoard();
+        function oyunuBaslat() {
+            tahtayiCiz();
         }
 
-        function renderBoard() {
-            boardEl.innerHTML = '';
+        function tahtayiCiz() {
+            tahtaElemani.innerHTML = '';
             for (let i = 0; i < 9; i++) {
-                const tile = document.createElement('div');
-                tile.classList.add('tile');
-                if (state[i] === 0) {
-                    tile.classList.add('empty');
-                    tile.innerText = '';
+                const tasElemani = document.createElement('div');
+                tasElemani.classList.add('tas');
+                
+                if (mevcutDurum[i] === 0) {
+                    tasElemani.classList.add('bos');
+                    tasElemani.innerText = '';
                 } else {
-                    tile.innerText = state[i];
-                    tile.onclick = () => moveTile(i);
+                    tasElemani.innerText = mevcutDurum[i];
+                    tasElemani.onclick = () => tasTasi(i);
                 }
-                boardEl.appendChild(tile);
+                tahtaElemani.appendChild(tasElemani);
             }
-            inputEl.value = state.join('');
-            checkWin();
+            girdiElemani.value = mevcutDurum.join('');
+            kazanmaKontroluYapm();
         }
 
-        function moveTile(index) {
-            const emptyIndex = state.indexOf(0);
-            const validMoves = getValidMoves(emptyIndex);
+        function tasTasi(tiklananIndeks) {
+            const bosKareIndeksi = mevcutDurum.indexOf(0);
+            const gecerliHamleler = gecerliHamleleriAl(bosKareIndeksi);
 
-            if (validMoves.includes(index)) {
-                // Swap
-                [state[index], state[emptyIndex]] = [state[emptyIndex], state[index]];
-                solutionPath = []; // Kullanıcı hamle yaparsa eski çözümü sıfırla
-                renderBoard();
+            if (gecerliHamleler.includes(tiklananIndeks)) {
+                // Taşların yerini değiştir
+                [mevcutDurum[tiklananIndeks], mevcutDurum[bosKareIndeksi]] = [mevcutDurum[bosKareIndeksi], mevcutDurum[tiklananIndeks]];
+                cozumYolu = []; // Kullanıcı elle hamle yaparsa otomatik çözümü iptal et
+                tahtayiCiz();
             }
         }
 
-        function getValidMoves(emptyIndex) {
-            const moves = [];
-            const row = Math.floor(emptyIndex / 3);
-            const col = emptyIndex % 3;
+        function gecerliHamleleriAl(bosKareIndeksi) {
+            const yapilabilecekHamleler = [];
+            const satir = Math.floor(bosKareIndeksi / 3);
+            const sutun = bosKareIndeksi % 3;
 
-            if (row > 0) moves.push(emptyIndex - 3); // Yukarı
-            if (row < 2) moves.push(emptyIndex + 3); // Aşağı
-            if (col > 0) moves.push(emptyIndex - 1); // Sol
-            if (col < 2) moves.push(emptyIndex + 1); // Sağ
+            if (satir > 0) yapilabilecekHamleler.push(bosKareIndeksi - 3); // yukarı
+            if (satir < 2) yapilabilecekHamleler.push(bosKareIndeksi + 3); // aşağı
+            if (sutun > 0) yapilabilecekHamleler.push(bosKareIndeksi - 1); // sol
+            if (sutun < 2) yapilabilecekHamleler.push(bosKareIndeksi + 1); // sağ
 
-            return moves;
+            return yapilabilecekHamleler;
         }
 
-        function setState() {
-            const val = inputEl.value;
-            if (val.length === 9 && new Set(val.split('')).size === 9 && /^[0-8]+$/.test(val)) {
-                state = val.split('').map(Number);
-                solutionPath = [];
-                msgEl.innerText = "";
-                renderBoard();
+        function durumuAyarla() {
+            const girilenDeger = girdiElemani.value;
+            if (girilenDeger.length === 9 && new Set(girilenDeger.split('')).size === 9 && /^[0-8]+$/.test(girilenDeger)) {
+                mevcutDurum = girilenDeger.split('').map(Number);
+                cozumYolu = [];
+                mesajElemani.innerText = "";
+                tahtayiCiz();
             } else {
-                alert("Lütfen 0'dan 8'e kadar her rakamın 1 kez kullanıldığı 9 haneli bir durum girin.");
+                alert("Lütfen 0'dan 8'e kadar her rakamın yalnızca 1 kez kullanıldığı 9 haneli bir sayı girin.");
             }
         }
 
-        // Çözülebilir bir rastgele durum oluşturma
-        function randomizeState() {
+        function rastgeleDurumOlustur() {
             do {
-                state = [...goalState].sort(() => Math.random() - 0.5);
-            } while (!isSolvable(state));
-            solutionPath = [];
-            msgEl.innerText = "";
-            renderBoard();
+                mevcutDurum = [...hedefDurum].sort(() => Math.random() - 0.5);
+            } while (!matematikselOlarakCozulebilirMi(mevcutDurum));
+            cozumYolu = [];
+            mesajElemani.innerText = "";
+            tahtayiCiz();
         }
 
-        // 8-Puzzle çözülebilirlik kontrolü (Inversion Count)
-        function isSolvable(arr) {
-            let invCount = 0;
+        function matematikselOlarakCozulebilirMi(dizi) {
+            let terslikSayisi = 0;
             for (let i = 0; i < 9 - 1; i++) {
                 for (let j = i + 1; j < 9; j++) {
-                    if (arr[i] && arr[j] && arr[i] > arr[j]) {
-                        invCount++;
+                    if (dizi[i] && dizi[j] && dizi[i] > dizi[j]) {
+                        terslikSayisi++;
                     }
                 }
             }
-            return invCount % 2 === 0;
+            return terslikSayisi % 2 === 0;
         }
 
-        function checkWin() {
-            if (state.join('') === goalState.join('')) {
-                msgEl.innerText = "Bulmaca Çözüldü! 🎉";
+        function kazanmaKontroluYapm() {
+            if (mevcutDurum.join('') === hedefDurum.join('')) {
+                mesajElemani.innerText = "Bulmaca Başarıyla Çözüldü! 🎉";
             }
         }
 
-        // --- YAPAY ZEKA ÇÖZÜCÜ (BFS - Uniform Cost) ---
-        async function startSolving() {
-            if (state.join('') === goalState.join('')) {
-                msgEl.innerText = "Zaten çözülmüş durumda!";
+        //yapay zeka çözücü
+        async function cozmeyeBasla() {
+            if (mevcutDurum.join('') === hedefDurum.join('')) {
+                mesajElemani.innerText = "Tahta zaten çözülmüş durumda!";
                 return;
             }
 
-            if(!isSolvable(state)) {
-                msgEl.innerText = "Hata: Bu tahta durumu matematiksel olarak çözülemez!";
-                msgEl.style.color = "#ff6b6b";
+            if(!matematikselOlarakCozulebilirMi(mevcutDurum)) {
+                mesajElemani.innerText = "Hata: Bu tahta dizilimi matematik kuralları gereği çözülemez!";
+                mesajElemani.style.color = "#ff6b6b";
                 return;
             }
 
-            msgEl.style.color = "#a3f7bf";
-            msgEl.innerText = "Çözülüyor... Lütfen bekleyin.";
+            mesajElemani.style.color = "#a3f7bf";
+            mesajElemani.innerText = "En kısa yol hesaplanıyor... Lütfen bekleyin.";
             
-            // UI kilitlenmesin diye ufak bir bekleme (Asenkron hissi)
             setTimeout(() => {
-                const path = solve(state);
-                if (path) {
-                    solutionPath = path;
-                    currentStep = 0;
-                    msgEl.innerText = `Çözüm bulundu! Toplam ${path.length} adım. Oynat butonuna bas.`;
+                const bulunanYol = yapayZekaIleCoz(mevcutDurum);
+                if (bulunanYol) {
+                    baslangicDurumuKopyasi = [...mevcutDurum];
+                    cozumYolu = bulunanYol;
+                    guncelAdimIndeksi = 0;
+                    mesajElemani.innerText = `Çözüm bulundu! Toplam ${bulunanYol.length} adım. İzlemek için Oynat butonuna bas.`;
                 } else {
-                    msgEl.innerText = "Çözüm bulunamadı.";
+                    mesajElemani.innerText = "Çözüm bulunamadı.";
                 }
             }, 100);
         }
 
-        function solve(start) {
-            let queue = [{ s: start, path: [] }];
-            let visited = new Set();
-            visited.add(start.join(''));
-            const goalStr = goalState.join('');
+        function yapayZekaIleCoz(baslangicDurumu) {
+            let aramaKuyrugu = [{ durum: baslangicDurumu, adimGecmisi: [] }];
+            let ziyaretEdilenDurumlar = new Set();
+            ziyaretEdilenDurumlar.add(baslangicDurumu.join(''));
+            const hedefMetin = hedefDurum.join('');
 
-            while (queue.length > 0) {
-                let current = queue.shift();
+            while (aramaKuyrugu.length > 0) {
+                let islenenDugum = aramaKuyrugu.shift();
                 
-                if (current.s.join('') === goalStr) {
-                    return current.path;
+                if (islenenDugum.durum.join('') === hedefMetin) {
+                    return islenenDugum.adimGecmisi;
                 }
 
-                let emptyIdx = current.s.indexOf(0);
-                let moves = getValidMoves(emptyIdx);
+                let bosIndeks = islenenDugum.durum.indexOf(0);
+                let ihtimaller = gecerliHamleleriAl(bosIndeks);
 
-                for (let move of moves) {
-                    let nextState = [...current.s];
-                    [nextState[emptyIdx], nextState[move]] = [nextState[move], nextState[emptyIdx]];
-                    let nextStr = nextState.join('');
+                for (let hedefHamle of ihtimaller) {
+                    let yeniDurum = [...islenenDugum.durum];
+                    [yeniDurum[bosIndeks], yeniDurum[hedefHamle]] = [yeniDurum[hedefHamle], yeniDurum[bosIndeks]];
+                    let yeniDurumMetin = yeniDurum.join('');
 
-                    if (!visited.has(nextStr)) {
-                        visited.add(nextStr);
-                        queue.push({ s: nextState, path: [...current.path, nextState] });
+                    if (!ziyaretEdilenDurumlar.has(yeniDurumMetin)) {
+                        ziyaretEdilenDurumlar.add(yeniDurumMetin);
+                        aramaKuyrugu.push({ durum: yeniDurum, adimGecmisi: [...islenenDugum.adimGecmisi, yeniDurum] });
                     }
                 }
             }
             return null;
         }
 
-        // --- OYNATMA KONTROLLERİ ---
-        function nextStep() {
-            if (solutionPath.length > 0 && currentStep < solutionPath.length) {
-                state = solutionPath[currentStep];
-                currentStep++;
-                renderBoard();
+        //oynatma kontrolleri
+        function sonrakiAdim() {
+            if (cozumYolu.length > 0 && guncelAdimIndeksi < cozumYolu.length) {
+                mevcutDurum = cozumYolu[guncelAdimIndeksi];
+                guncelAdimIndeksi++;
+                tahtayiCiz();
             }
         }
 
-        function prevStep() {
-            if (solutionPath.length > 0 && currentStep > 0) {
-                currentStep--;
-                // Önceki adımı alırken eğer ilk adımsak başlangıç durumunu nasıl bulacağız?
-                // En temizi solutionPath içine baştaki state'i de koymak ama biz yapmadık.
-                // O yüzden ufak bir trick:
-                if(currentStep === 0) {
-                   // başa döndük
+        function oncekiAdim() {
+            if (cozumYolu.length > 0 && guncelAdimIndeksi > 0) {
+                guncelAdimIndeksi--;
+                if(guncelAdimIndeksi === 0) {
+                    mevcutDurum = [...baslangicDurumuKopyasi];
                 } else {
-                   state = solutionPath[currentStep - 1];
-                   renderBoard();
+                    mevcutDurum = cozumYolu[guncelAdimIndeksi - 1];
                 }
+                tahtayiCiz();
             }
         }
 
-        function playSolution() {
-            if (solutionPath.length === 0 || currentStep >= solutionPath.length || isPlaying) return;
-            isPlaying = true;
+        function cozumuOynat() {
+            if (cozumYolu.length === 0 || guncelAdimIndeksi >= cozumYolu.length || animasyonOynuyorMu) return;
+            animasyonOynuyorMu = true;
             
-            const interval = setInterval(() => {
-                if (currentStep < solutionPath.length) {
-                    state = solutionPath[currentStep];
-                    renderBoard();
-                    currentStep++;
+            const zamanlayici = setInterval(() => {
+                if (guncelAdimIndeksi < cozumYolu.length) {
+                    mevcutDurum = cozumYolu[guncelAdimIndeksi];
+                    tahtayiCiz();
+                    guncelAdimIndeksi++;
                 } else {
-                    clearInterval(interval);
-                    isPlaying = false;
+                    clearInterval(zamanlayici);
+                    animasyonOynuyorMu = false;
                 }
-            }, 400); // Her adım arası 400ms bekle
+            }, 400); 
         }
 
-        // Oyunu başlat
-        init();
+        oyunuBaslat();
 
     </script>
 </body>
