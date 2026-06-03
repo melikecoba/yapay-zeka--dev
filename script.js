@@ -10,17 +10,15 @@ const tahtaElemani = document.getElementById('oyunTahtasi');
 const girdiElemani = document.getElementById('baslangicDurumuGirdisi');
 const mesajElemani = document.getElementById('bilgiMesaji');
 
-// --- ARAYÜZ KONTROLLERİ ---
+//arayüz kontrolleri
 function ekranDegistir(hedefEkran) {
     if(hedefEkran === 'oyun') {
         document.getElementById('girisEkrani').classList.add('gizli');
         document.getElementById('oyunEkrani').classList.remove('gizli');
-        // Oyuna girerken tahtayı hazırlayalım
         oyunuBaslat(); 
     } else if (hedefEkran === 'giris') {
         document.getElementById('oyunEkrani').classList.add('gizli');
         document.getElementById('girisEkrani').classList.remove('gizli');
-        // Mesajları temizleyelim
         mesajElemani.innerText = "";
     }
 }
@@ -33,7 +31,7 @@ function nasilOynanirKapat() {
     document.getElementById('nasilOynanirModal').classList.add('gizli');
 }
 
-// --- OYUN MANTIĞI ---
+//oyun mantığı
 function oyunuBaslat() {
     tahtayiCiz();
 }
@@ -180,7 +178,7 @@ function yapayZekaIleCoz(baslangicDurumu) {
     return null;
 }
 
-// --- OYNATMA KONTROLLERİ ---
+//oyun kontrolleri
 function sonrakiAdim() {
     if (cozumYolu.length > 0 && guncelAdimIndeksi < cozumYolu.length) {
         mevcutDurum = cozumYolu[guncelAdimIndeksi];
@@ -216,6 +214,3 @@ function cozumuOynat() {
         }
     }, 400); 
 }
-
-// Artık oyunu sayfa yüklenince değil, "Oyuna Başla" butonuna basınca başlatıyoruz.
-// O yüzden oyunuBaslat() fonksiyonu ekranDegistir('oyun') içine taşındı.
