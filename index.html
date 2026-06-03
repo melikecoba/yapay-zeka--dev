@@ -28,7 +28,7 @@
             <ul class="bilgi-listesi">
                 <li><b>Amaç:</b> Karmaşık olarak dizilmiş taşları kaydırarak 1'den 8'e kadar sıralamak ve boşluğu en sona getirmektir.</li>
                 <li><b>Oynanış:</b> Boş (koyu mavi) alanın yanındaki taşlara tıklayarak yerlerini değiştirebilirsiniz.</li>
-                <li><b>Kendi Durumunu Gir:</b> "Başlangıç Durumu" kutusuna 0-8 arası rakamları sırasıyla yazarak kendi bulmacanı oluşturabilirsin (0 boşluğu temsil eder).</li>
+                <li><b>Kendi Durumunu Gir:</b> "Anlık Durum" kutusuna 0-8 arası rakamları sırasıyla yazarak kendi bulmacanı oluşturabilirsin (0 boşluğu temsil eder).</li>
                 <li><b>Yapay Zeka Çözümü:</b> "Çöz" butonuna tıkladığınızda bilgisayar en kısa yolu bulur. Ardından oynat (►) butonuna basarak çözümü izleyebilirsiniz.</li>
             </ul>
             <button class="kapat-buton" onclick="nasilOynanirKapat()">Anladım, Kapat</button>
@@ -44,7 +44,7 @@
         </div>
         
         <div class="ust-kontroller">
-            <label for="baslangicDurumuGirdisi">Başlangıç Durumu:</label>
+            <label for="baslangicDurumuGirdisi">Anlık Durum:</label>
             <input type="text" id="baslangicDurumuGirdisi" value="208135467" maxlength="9">
             <button onclick="durumuAyarla()">Durumu Ayarla</button>
             <button onclick="rastgeleDurumOlustur()">Rastgele Dağıt</button>
